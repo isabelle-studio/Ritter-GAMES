@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Ritter Games</title>
+
+<style>
+
+body{
+    margin:0;
+    background:#24254f;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    height:100vh;
+    overflow:hidden;
+}
+
+#logo{
+    width:220px;
+    height:auto;
+}
+
+</style>
+</head>
+
+<body>
+
+<img id="logo" src="assets/icon-rot.png">
+
+<script>
+
+const logos = [
+    "assets/icon-rot.png",
+    "assets/icon-gruen.png",
+    "assets/icon-gelb.png",
+    "assets/icon-blau.png",
+    "assets/icon-pink.png"
+];
+
+let current = 0;
+
+const logo = document.getElementById("logo");
+
+const interval = setInterval(() => {
+
+    current++;
+
+    if(current >= logos.length){
+        current = 0;
+    }
+
+    logo.src = logos[current];
+
+}, 300);
+
+setTimeout(() => {
+
+    window.location.href = "index.html";
+
+}, 2500);
+
+</script>
+
+</body>
+</html>
