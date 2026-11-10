@@ -27,6 +27,29 @@ let currentPiece;
 let nextPiece;
 let gameFont;
 let lastBodyColor = "";
+function loadSave() {
+  try { return JSON.parse(localStorage.getItem("ritterGames")) || {}; }
+  catch (e) { return {}; }
+}
+
+function writeSave(data) {
+  try { localStorage.setItem("ritterGames", JSON.stringify(data)); }
+  catch (e) {}
+}
+
+let highscore = loadSave().tetrisHigh || 0;
+let newRecord = false;
+
+function submitScore() {
+  const save = loadSave();
+  const old = save.tetrisHigh || 0;
+  newRecord = score > old;
+  if (newRecord) {
+    save.tetrisHigh = score;
+    writeSave(save);
+  }
+  highscore = Math.max(old, score);
+}
 
 let paused = false;
 let loadedAssets = 0;
@@ -308,7 +331,10 @@ if (lastBodyColor !== themes[themeIndex].color) {
   }
 
   if (gameState === "over") {
-    if (gameOverTime === 0) gameOverTime = millis();
+   if (gameOverTime === 0) {
+  gameOverTime = millis();
+  submitScore();
+}
     drawGameOver();
   }
 
