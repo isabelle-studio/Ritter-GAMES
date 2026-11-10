@@ -27,6 +27,7 @@ let currentPiece;
 let nextPiece;
 let gameFont;
 let lastBodyColor = "";
+let showExitPopup = false;
 function loadSave() {
   try { return JSON.parse(localStorage.getItem("ritterGames")) || {}; }
   catch (e) { return {}; }
@@ -230,6 +231,7 @@ function resetGame() {
   board = [];
   gameOverTime = 0;
   lastBodyColor = "";
+  showExitPopup = false;
 
   for (let y = 0; y < ROWS; y++) {
     board.push(Array(COLS).fill(null));
@@ -302,7 +304,7 @@ if (lastBodyColor !== themes[themeIndex].color) {
   drawFooter();
 
   if (gameState === "playing") {
-    if (!paused && millis() >= clearAnimationUntil) {
+    if (!paused && !showExitPopup && millis() >= clearAnimationUntil) {
       if (clearRowsPending.length > 0) {
         finishRowClear();
       }
@@ -347,6 +349,9 @@ if (lastBodyColor !== themes[themeIndex].color) {
     textSize(40);
     text("PAUSE", W / 2, BOARD_Y + (ROWS * CELL) / 2);
     textStyle(NORMAL);
+  }
+    if (showExitPopup && gameState === "playing") {
+    drawExitPopup();
   }
 }
 
@@ -635,6 +640,56 @@ function collides(piece, dx, dy, cells) {
   return false;
 }
 
+function getPopupBounds() {
+  return { x: (W - 400) / 2, y: H / 2 - 145, w: 400, h: 290 };
+}
+
+function getPopupResumeButton() {
+  const p = getPopupBounds();
+  return { x: (W - 320) / 2, y: p.y + 110, w: 320, h: 60 };
+}
+
+function getPopupMenuButton() {
+  const p = getPopupBounds();
+  return { x: (W - 320) / 2, y: p.y + 190, w: 320, h: 60 };
+}
+
+function drawExitPopup() {
+  fill(0, 0, 0, 180);
+  noStroke();
+  rect(0, 0, W, H);
+
+  const p = getPopupBounds();
+  fill("#24264f");
+  rect(p.x, p.y, p.w, p.h, 20);
+
+  fill(255);
+  textAlign(CENTER, CENTER);
+
+  textStyle(BOLD);
+  textSize(26);
+  text("PUNKTE: " + score, W / 2, p.y + 40);
+
+  textStyle(NORMAL);
+  textSize(18);
+  text("Highscore: " + Math.max(highscore, score), W / 2, p.y + 75);
+
+  const r = getPopupResumeButton();
+  fill("#e5183c");
+  rect(r.x, r.y, r.w, r.h, 14);
+
+  const m = getPopupMenuButton();
+  fill("#383a68");
+  rect(m.x, m.y, m.w, m.h, 14);
+
+  fill(255);
+  textStyle(BOLD);
+  textSize(18);
+  text("WEITERSPIELEN", r.x + r.w / 2, r.y + r.h / 2);
+  text("HAUPTMENÜ", m.x + m.w / 2, m.y + m.h / 2);
+  textStyle(NORMAL);
+}
+
 function stepDown() {
   if (!currentPiece || clearRowsPending.length > 0) return;
 
@@ -845,11 +900,25 @@ if (event.pointerType === "mouse" && event.button !== 0) return;
 
     const endX = (event.clientX - rect.left) * W / rect.width;
     const endY = (event.clientY - rect.top) * H / rect.height;
-        if (gameState === "loading") return;
+         if (gameState === "loading") return;
 
-        // Logo: zurück zur Spieleauswahl
+    // Popup hat Vorrang
+    if (showExitPopup) {
+      if (hitRect(endX, endY, getPopupMenuButton())) {
+        window.location.href = HUB_URL;
+      } else {
+        showExitPopup = false;   // Weiterspielen oder Tipp daneben
+      }
+      return;
+    }
+
+    // Logo: im Spiel Popup öffnen, sonst direkt ins Hauptmenü
     if (hitRect(endX, endY, getIconBounds())) {
-      window.location.href = HUB_URL;
+      if (gameState === "playing") {
+        showExitPopup = true;
+      } else {
+        window.location.href = HUB_URL;
+      }
       return;
     }
 
@@ -941,6 +1010,10 @@ if (gameState !== "playing" || clearRowsPending.length > 0 || paused) return;
 
 function keyPressed(event) {
     if (gameState === "loading") return false;
+    if (showExitPopup) {
+    if (event.key === "Escape") showExitPopup = false;
+    return false;
+  }
   // Neustart oder Spiel starten
   if (gameState === "menu" || gameState === "over") {
     if (event.key === "Enter" || event.code === "Space") {
