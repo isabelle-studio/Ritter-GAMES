@@ -26,6 +26,7 @@ let board = [];
 let currentPiece;
 let nextPiece;
 let gameFont;
+let lastBodyColor = "";
 
 let paused = false;
 let loadedAssets = 0;
@@ -259,8 +260,12 @@ function draw() {
 
   const dt = min(deltaTime, 50);
   lastTime += dt;
-
+if (lastBodyColor !== themes[themeIndex].color) {
+  lastBodyColor = themes[themeIndex].color;
+  document.body.style.background = lastBodyColor;
+}
   background(themes[themeIndex].color);
+  
   textFont(gameFont);
 
   drawHeader();
@@ -976,15 +981,13 @@ function windowResized() {
 function fitCanvasToScreen() {
   const canvas = document.querySelector("canvas");
   if (!canvas) return;
-
- const scale = window.innerWidth / W;
-  );
-
-  canvas.style.position = "fixed";
-  canvas.style.width = `${W * scale}px`;
-  canvas.style.height = `${H * scale}px`;
-  canvas.style.left = "0%";
-  canvas.style.top = "0%";
+  
+  const scale = Math.min(window.innerWidth / W, window.innerHeight / H);
+canvas.style.position = "fixed";
+canvas.style.width = `${W * scale}px`;
+canvas.style.height = `${H * scale}px`;
+canvas.style.left = `${(window.innerWidth - W * scale) / 2}px`;
+canvas.style.top = `${(window.innerHeight - H * scale) / 2}px`;
   canvas.style.margin = "0";
   canvas.style.transform = "none";
   canvas.style.display = "block";
@@ -997,5 +1000,4 @@ function fitCanvasToScreen() {
   document.body.style.height = "100%";
   document.body.style.overflow = "hidden";
   document.body.style.background = "#e5183c";
-  
 }
