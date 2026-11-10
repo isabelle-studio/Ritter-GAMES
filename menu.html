@@ -2,12 +2,12 @@
 <html lang="de">
 
 <head>
+      <meta charset="UTF-8">
     <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="snake/icon-180.png">
 <meta name="theme-color" content="#24264f">
 <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Ritter Games</title>
 
   
@@ -20,13 +20,14 @@
 }
         body {
             margin: 0;
-            background: #24254f;
+            background: #24264f;
 
            display:flex;
            justify-content:center;
            align-items:center;
 
-           height:100vh;
+         height:100vh;
+         height:100dvh;
 
     font-family:"Jost", sans-serif;
     user-select:none;
@@ -56,6 +57,7 @@ h1{
         .card {
             cursor: pointer;
             transition: transform 0.2s;
+            display: block;
         }
 
         .card:hover {
@@ -82,13 +84,13 @@ h1{
 
     <div class="menu">
 
-    <div class="card" onclick="location.href='snake/'">
-        <img src="assets/icon-snake.png" alt="Snake">
-    </div>
+   <a class="card" href="snake/">
+    <img src="assets/icon-snake.png" alt="Snake">
+</a>
 
-    <div class="card" onclick="location.href='tetris/'">
-        <img src="assets/icon-tetris.png" alt="Tetris">
-    </div>
+<a class="card" href="tetris/">
+    <img src="assets/icon-tetris.png" alt="Tetris">
+</a>
 
     </div>
 
