@@ -1,70 +1,59 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ritter Games</title>
 
-<title>Ritter Games</title>
+    <style>
+        body {
+            margin: 0;
+            background: #24254f;
+            color: white;
 
-<style>
+            display: flex;
+            justify-content: center;
+            align-items: center;
 
-body{
-    margin:0;
-    background:#24254f;
+            height: 100vh;
+        }
 
-    display:flex;
-    justify-content:center;
-    align-items:center;
+        .menu {
+            display: flex;
+            gap: 60px;
+        }
 
-    height:100vh;
-    overflow:hidden;
-}
+        .card {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
 
-#logo{
-    width:220px;
-    height:auto;
-}
+        .card:hover {
+            transform: scale(1.05);
+        }
 
-</style>
+        .card img {
+            width: 260px;
+            height: 260px;
+            display: block;
+        }
+    </style>
 </head>
 
 <body>
 
-<img id="logo" src="assets/icon-rot.png">
+<div class="menu">
 
-<script>
+    <div class="card" onclick="location.href='snake/'">
+        <img src="assets/icon-snake.png" alt="Snake">
+    </div>
 
-const logos = [
-    "assets/icon-rot.png",
-    "assets/icon-gruen.png",
-    "assets/icon-gelb.png",
-    "assets/icon-blau.png",
-    "assets/icon-pink.png"
-];
+    <div class="card" onclick="location.href='tetris/'">
+        <img src="assets/icon-tetris.png" alt="Tetris">
+    </div>
 
-let current = 0;
-
-const logo = document.getElementById("logo");
-
-const interval = setInterval(() => {
-
-    current++;
-
-    if(current >= logos.length){
-        current = 0;
-    }
-
-    logo.src = logos[current];
-
-}, 300);
-
-setTimeout(() => {
-
-    window.location.href = "index.html";
-
-}, 2500);
-
-</script>
+</div>
 
 </body>
 </html>
