@@ -20,6 +20,7 @@ let swipeStartX = 0;
 let swipeStartY = 0;
 let gameOverTime = 0;
 let paused = false;
+let showExitPopup = false;
 
 function fitCanvas() {
   let s = min(windowWidth / 1080, windowHeight / 1920);
@@ -99,11 +100,11 @@ let imagesLoaded = false;
 
 // Spielfeld-Koordinaten (global, damit alle Zeichenfunktionen darauf zugreifen können)
 const cols = 18;
-const rows = 32;
+const rows = 36;
 const gridSize = 50;
 const headerH = 100;
 
-const fieldX = 90;
+const fieldX = 0;
 const fieldY = headerH;
 const fieldW = cols * gridSize; // 900 px
 const fieldH = rows * gridSize; // 1600 px
@@ -219,6 +220,9 @@ function draw() {
   }
     drawBackIcon();
     drawPauseButton();
+  if (showExitPopup) {
+  drawExitPopup();
+}
 }
 
 // ------------------------------------
@@ -401,12 +405,26 @@ function handleTap(px, py) {
     return;
   }
 
-  // Im Spiel: Icon führt zurück zur Sortenauswahl
-  if (hitTest(px, py, getIconBounds())) {
+if (hitTest(px, py, getIconBounds())) {
+  showExitPopup = true;
+  return;
+}
+
+  if (showExitPopup) {
+
+  if (hitTest(px, py, getPopupLevelButton())) {
+    showExitPopup = false;
     backToMenu();
     return;
   }
 
+  if (hitTest(px, py, getPopupMainMenuButton())) {
+    window.location.href = "../menu.html";
+    return;
+  }
+
+}
+  
   if (hitTest(px, py, getPauseButtonBounds())) {
   paused = !paused;
   return;
@@ -520,6 +538,33 @@ function getMenuButtonBounds() {
   return { x: (width - w) / 2, y: height / 2 + 260, w: w, h: h };
 }
 
+function getPopupBounds() {
+  return {
+    x: width / 2 - 320,
+    y: height / 2 - 180,
+    w: 640,
+    h: 360
+  };
+}
+
+function getPopupLevelButton() {
+  return {
+    x: width / 2 - 250,
+    y: height / 2 - 20,
+    w: 500,
+    h: 80
+  };
+}
+
+function getPopupMainMenuButton() {
+  return {
+    x: width / 2 - 250,
+    y: height / 2 + 90,
+    w: 500,
+    h: 80
+  };
+}
+
 function getIconBounds() {
   let size = 90;
   let margin = 30;
@@ -549,6 +594,51 @@ function backToMenu() {
   gameOver = false;
   gameOverTime = 0;
   particles = [];
+}
+
+function drawExitPopup() {
+
+  fill(0, 0, 0, 180);
+  rect(0, 0, width, height);
+
+  let p = getPopupBounds();
+
+  fill("#24264f");
+  rect(p.x, p.y, p.w, p.h, 30);
+
+  drawText(
+    "WOHIN MÖCHTEST DU?",
+    width / 2,
+    p.y + 60,
+    40,
+    BOLD
+  );
+
+  let level = getPopupLevelButton();
+
+  fill("#e5183c");
+  rect(level.x, level.y, level.w, level.h, 20);
+
+  drawText(
+    "SORTENAUSWAHL",
+    width / 2,
+    level.y + level.h / 2,
+    30,
+    BOLD
+  );
+
+  let main = getPopupMainMenuButton();
+
+  fill("#383a68");
+  rect(main.x, main.y, main.w, main.h, 20);
+
+  drawText(
+    "HAUPTMENÜ",
+    width / 2,
+    main.y + main.h / 2,
+    30,
+    BOLD
+  );
 }
 
 // ------------------------------------
