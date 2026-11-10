@@ -550,7 +550,7 @@ function getPopupBounds() {
 function getPopupLevelButton() {
   return {
     x: width / 2 - 250,
-    y: height / 2 - 20,
+    y: height / 2 - 60,
     w: 500,
     h: 80
   };
@@ -559,7 +559,7 @@ function getPopupLevelButton() {
 function getPopupMainMenuButton() {
   return {
     x: width / 2 - 250,
-    y: height / 2 + 90,
+    y: height / 2 + 50,
     w: 500,
     h: 80
   };
