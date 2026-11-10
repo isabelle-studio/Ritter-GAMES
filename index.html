@@ -23,6 +23,7 @@
 
         h1 {
             margin-bottom: 50px;
+            font-size: 48px;
         }
 
         .menu {
@@ -31,19 +32,28 @@
         }
 
         .card {
-            width: 180px;
-            height: 180px;
+            width: 220px;
+            cursor: pointer;
+            text-align: center;
+            transition: transform 0.2s;
+        }
 
-            background: white;
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .card img {
+            width: 220px;
+            height: 220px;
             border-radius: 20px;
+            display: block;
+        }
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            color: black;
+        .label {
+            margin-top: 15px;
             font-size: 24px;
             font-weight: bold;
+            color: white;
         }
     </style>
 </head>
@@ -53,8 +63,17 @@
     <h1>RITTER GAMES</h1>
 
     <div class="menu">
-        <div class="card">Snake</div>
-        <div class="card">Tetris</div>
+
+        <div class="card">
+            <img src="assets/icon-snake.png" alt="Snake">
+            <div class="label">SNAKE</div>
+        </div>
+
+        <div class="card">
+            <img src="assets/icon-tetris.png" alt="Tetris">
+            <div class="label">TETRIS</div>
+        </div>
+
     </div>
 
 </body>
