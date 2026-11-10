@@ -775,11 +775,12 @@ function rotatePiece() {
 
   const normalized = rotated.map(([x, y]) => [x - minX, y - minY]);
 
- for (const k of [0, -1, 1, -2, 2]) {
-  if (!collides(currentPiece, k, 0, normalized)) {
-    currentPiece.x += k;
-    currentPiece.cells = normalized;
-    break;
+  for (const k of [0, -1, 1, -2, 2]) {
+    if (!collides(currentPiece, k, 0, normalized)) {
+      currentPiece.x += k;
+      currentPiece.cells = normalized;
+      break;
+    }
   }
 }
 
