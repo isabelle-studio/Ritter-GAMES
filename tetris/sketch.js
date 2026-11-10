@@ -134,6 +134,7 @@ function setup() {
 
 function drawLoadingScreen() {
   background("#24264f");
+  document.body.style.background = "#24264f";
 
   const size = 150;
   const cx = W / 2;
@@ -203,6 +204,7 @@ function loadFail(name) {
 function resetGame() {
   board = [];
   gameOverTime = 0;
+  lastBodyColor = "";
 
   for (let y = 0; y < ROWS; y++) {
     board.push(Array(COLS).fill(null));
@@ -998,5 +1000,4 @@ canvas.style.top = `${(window.innerHeight - H * scale) / 2}px`;
   document.body.style.width = "100%";
   document.body.style.height = "100%";
   document.body.style.overflow = "hidden";
-  document.body.style.background = "#e5183c";
 }
