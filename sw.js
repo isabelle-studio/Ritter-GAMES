@@ -1,4 +1,4 @@
-const CACHE = "ritter-v1";
+const CACHE = "ritter-v2";
 
 const FILES = [
   "./", "index.html", "loader.html", "menu.html", "manifest.json",
@@ -6,7 +6,7 @@ const FILES = [
   "assets/icon-rot.png", "assets/icon-gruen.png", "assets/icon-gelb.png",
   "assets/icon-blau.png", "assets/icon-pink.png",
   "assets/icon-snake.png", "assets/icon-tetris.png",
-  "assets/icon-192.png", "assets/icon-512.png",
+  "assets/icon-192.png", "assets/icon-512.png", "assets/Jost.ttf",
 
   "snake/", "snake/index.html", "snake/style.css", "snake/sketch.js",
   "snake/p5.js", "snake/p5.sound.min.js", "snake/icon.svg",
