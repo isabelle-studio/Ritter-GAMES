@@ -569,11 +569,14 @@ function drawGameOver() {
 
   fill(255);
   textSize(24);
-  text("Punkte: " + score, W / 2, H / 2 + 40);
+   text("Punkte: " + score, W / 2, H / 2 + 40);
+
+  textSize(18);
+  text(newRecord ? "NEUER HIGHSCORE!" : "Highscore: " + highscore, W / 2, H / 2 + 72);
 
   textStyle(NORMAL);
   textSize(16);
-  text("TIPPE ZUM NEUSTARTEN", W / 2, H / 2 + 80);
+  text("TIPPE ZUM NEUSTARTEN", W / 2, H / 2 + 105);
 
   // Button
   const b = getMenuButtonBounds();
