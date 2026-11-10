@@ -43,10 +43,10 @@ const flavorSettings = {
 };
 
 // ------------------------------------
-// TYPOGRAFIE – FUTURA PT
+// TYPOGRAFIE – Jost
 // ------------------------------------
 
-const gameFont = "futura-pt";
+const gameFont = "Jost";
 
 function getPauseButtonBounds() {
   return {
@@ -131,6 +131,8 @@ function setup() {
   frameRate(30);
   background("#24264f");
   loadingStartTime = millis();
+  document.fonts.load("400 16px Jost");
+  document.fonts.load("700 16px Jost");
 
   // Icon für den Zurück-Button laden
   let iconEl = new Image();
