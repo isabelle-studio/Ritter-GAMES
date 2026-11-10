@@ -1,73 +1,70 @@
 <!DOCTYPE html>
 <html lang="de">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ritter Games</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        body {
-            margin: 0;
-            background: #24254f;
-            color: white;
-            font-family: Arial, sans-serif;
+<title>Ritter Games</title>
 
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+<style>
 
-            height: 100vh;
-        }
+body{
+    margin:0;
+    background:#24254f;
 
-        h1 {
-            margin-bottom: 50px;
-            font-size: 48px;
-        }
+    display:flex;
+    justify-content:center;
+    align-items:center;
 
-        .menu {
-            display: flex;
-            gap: 40px;
-        }
-
-        .card {
-            width: 220px;
-            cursor: pointer;
-            text-align: center;
-            transition: transform 0.2s;
-        }
-
-        .card:hover {
-            transform: scale(1.05);
-        }
-
-      .card img {
-    width: 220px;
-    height: 220px;
-    display: block;
+    height:100vh;
+    overflow:hidden;
 }
 
-      
-    </style>
+#logo{
+    width:220px;
+    height:auto;
+}
+
+</style>
 </head>
 
 <body>
 
-    <h1>RITTER GAMES</h1>
+<img id="logo" src="assets/icon-rot.png">
 
-    <div class="menu">
+<script>
 
-     <div class="card" onclick="location.href='snake/'">
-    <img src="assets/icon-snake.png" alt="Snake">
-</div>
+const logos = [
+    "assets/icon-rot.png",
+    "assets/icon-gruen.png",
+    "assets/icon-gelb.png",
+    "assets/icon-blau.png",
+    "assets/icon-pink.png"
+];
 
-<div class="card" onclick="location.href='tetris/'">
-    <img src="assets/icon-tetris.png" alt="Tetris">
-</div>
+let current = 0;
 
-    </div>
+const logo = document.getElementById("logo");
+
+const interval = setInterval(() => {
+
+    current++;
+
+    if(current >= logos.length){
+        current = 0;
+    }
+
+    logo.src = logos[current];
+
+}, 300);
+
+setTimeout(() => {
+
+    window.location.href = "index.html";
+
+}, 2500);
+
+</script>
 
 </body>
-
 </html>
