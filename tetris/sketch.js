@@ -789,7 +789,7 @@ function setupTouchControls() {
   canvas.style.touchAction = "none";
 
   canvas.addEventListener("pointerdown", function(event) {
-  // Maus und Touch erlauben
+if (event.pointerType === "mouse" && event.button !== 0) return;
 
     event.preventDefault();
 
@@ -801,7 +801,7 @@ function setupTouchControls() {
   });
 
   canvas.addEventListener("pointerup", function(event) {
-   // Maus und Touch erlauben
+  if (event.pointerType === "mouse" && event.button !== 0) return;
     event.preventDefault();
 
     const rect = canvas.getBoundingClientRect();
