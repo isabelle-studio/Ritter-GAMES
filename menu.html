@@ -73,6 +73,13 @@ h1{
     height:min(36vw, 220px);
     display:block;
 }
+      .score {
+    color: white;
+    text-align: center;
+    margin-top: 10px;
+    font-weight: 500;
+    font-size: clamp(14px, 3.5vw, 18px);
+}
     </style>
 </head>
 
@@ -84,17 +91,25 @@ h1{
 
     <div class="menu">
 
-   <a class="card" href="snake/">
+  <a class="card" href="snake/">
     <img src="assets/icon-snake.png" alt="Snake">
+    <div class="score" id="hs-snake">Highscore: 0</div>
 </a>
 
 <a class="card" href="tetris/">
     <img src="assets/icon-tetris.png" alt="Tetris">
+    <div class="score" id="hs-tetris">Highscore: 0</div>
 </a>
 
     </div>
 
 </div>
-
+<script>
+  try {
+    const save = JSON.parse(localStorage.getItem("ritterGames")) || {};
+    document.getElementById("hs-snake").textContent = "Highscore: " + (save.snakeHigh || 0);
+    document.getElementById("hs-tetris").textContent = "Highscore: " + (save.tetrisHigh || 0);
+  } catch (e) {}
+</script>
 </body>
 </html>
