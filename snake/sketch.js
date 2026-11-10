@@ -21,6 +21,29 @@ let swipeStartY = 0;
 let gameOverTime = 0;
 let paused = false;
 let showExitPopup = false;
+function loadSave() {
+  try { return JSON.parse(localStorage.getItem("ritterGames")) || {}; }
+  catch (e) { return {}; }
+}
+
+function writeSave(data) {
+  try { localStorage.setItem("ritterGames", JSON.stringify(data)); }
+  catch (e) {}
+}
+
+let highscore = loadSave().snakeHigh || 0;
+let newRecord = false;
+
+function submitScore() {
+  const save = loadSave();
+  const old = save.snakeHigh || 0;
+  newRecord = score > old;
+  if (newRecord) {
+    save.snakeHigh = score;
+    writeSave(save);
+  }
+  highscore = Math.max(old, score);
+}
 let failedFiles = [];
 
 function loadFail(name) {
@@ -212,7 +235,10 @@ function draw() {
     return;
   }
 
-  if (gameOver && gameOverTime === 0) gameOverTime = millis();
+  if (gameOver && gameOverTime === 0) {
+  gameOverTime = millis();
+  submitScore();
+}
 if (!gameOver && !paused && !showExitPopup) {
   handleControls();
   moveSnake();
@@ -539,8 +565,8 @@ function drawGameOver() {
   drawText("OVER", width / 2, height / 2 - 90, 300, BOLD, levelColor);
 
   drawText("Punkte: " + score, width / 2, height / 2 + 80, 48, BOLD, "#ffffff");
-  drawText("TIPPE ZUM NEUSTARTEN", width / 2, height / 2 + 160, 32, NORMAL, "#ffffff");
-
+  drawText(newRecord ? "NEUER HIGHSCORE!" : "Highscore: " + highscore, width / 2, height / 2 + 140, 38, BOLD, levelColor);
+  drawText("TIPPE ZUM NEUSTARTEN", width / 2, height / 2 + 200, 32, NORMAL, "#ffffff");
   // Button: Zur Sortenauswahl
   let b = getMenuButtonBounds();
   noStroke();
@@ -656,6 +682,7 @@ function drawExitPopup() {
     30,
     BOLD
   );
+    drawText("Highscore: " + highscore, width / 2, p.y + 335, 28, NORMAL, "#ffffff");
 }
 
 // ------------------------------------
