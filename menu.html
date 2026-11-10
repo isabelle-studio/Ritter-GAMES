@@ -19,6 +19,18 @@
             height: 100vh;
         }
 
+        .container{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+h1{
+    color:white;
+    font-size:48px;
+    margin-bottom:50px;
+}
+
         .menu {
             display: flex;
             gap: 60px;
@@ -43,7 +55,11 @@
 
 <body>
 
-<div class="menu">
+<div class="container">
+
+    <h1>RITTER GAMES</h1>
+
+    <div class="menu">
 
     <div class="card" onclick="location.href='snake/'">
         <img src="assets/icon-snake.png" alt="Snake">
@@ -51,6 +67,8 @@
 
     <div class="card" onclick="location.href='tetris/'">
         <img src="assets/icon-tetris.png" alt="Tetris">
+    </div>
+
     </div>
 
 </div>
