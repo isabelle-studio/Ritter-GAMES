@@ -113,11 +113,13 @@ function setup() {
   setTimeout(setupTouchControls, 100);
 
   imageMode(CORNER);
-  gameFont = "futura-pt";
+  gameFont = "Jost";
   textFont(gameFont);
   noStroke();
 
   loadingStartTime = millis();
+  document.fonts.load("400 16px Jost");
+  document.fonts.load("700 16px Jost");
 
   let iconEl = new Image();
   iconEl.onload = () => {
