@@ -35,7 +35,7 @@ const MIN_LOADING_TIME = 1500;   // Ladebildschirm mindestens 1,5 Sekunden (in m
 let failedFiles = [];
 let iconImage = null;
 const ICON_FILE = "icon.svg";   // Datei in den tetris-Ordner legen
-const HUB_URL = "../";          // später: Zurück zur Spieleauswahl
+const HUB_URL = "../menu.html";
 
 let score = 0;
 let lines = 0;
@@ -977,18 +977,16 @@ function fitCanvasToScreen() {
   const canvas = document.querySelector("canvas");
   if (!canvas) return;
 
-  const scale = Math.min(
-    window.innerWidth / W,
-    window.innerHeight / H
+ const scale = window.innerWidth / W;
   );
 
   canvas.style.position = "fixed";
   canvas.style.width = `${W * scale}px`;
   canvas.style.height = `${H * scale}px`;
-  canvas.style.left = "50%";
-  canvas.style.top = "50%";
+  canvas.style.left = "0%";
+  canvas.style.top = "0%";
   canvas.style.margin = "0";
-  canvas.style.transform = "translate(-50%, -50%)";
+  canvas.style.transform = "none";
   canvas.style.display = "block";
   canvas.style.maxWidth = "none";
   canvas.style.maxHeight = "none";
@@ -998,6 +996,6 @@ function fitCanvasToScreen() {
   document.body.style.width = "100%";
   document.body.style.height = "100%";
   document.body.style.overflow = "hidden";
-  document.body.style.background = "#111";
+  document.body.style.background = "#e5183c";
   
 }
