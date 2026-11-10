@@ -1,4 +1,10 @@
 html,
+@font-face {
+  font-family: "Jost";
+  src: url("../assets/Jost.ttf") format("truetype");
+  font-weight: 100 900;
+  font-display: block;
+}
 body {
   margin: 0;
   padding: 0;
