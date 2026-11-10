@@ -1,0 +1,1003 @@
+window.addEventListener("error", e => {
+  let d = document.createElement("div");
+  d.style.cssText = "position:fixed;left:0;top:0;right:0;background:#900;color:#fff;font:14px monospace;padding:8px;z-index:9999";
+  d.textContent = e.message + " (Zeile " + e.lineno + ")";
+  document.body.appendChild(d);
+});
+
+const W = 540;
+const H = 960;
+
+const COLS = 10;
+const ROWS = 20;
+const CELL = 30;
+const HEADER_H = 80;
+const BOARD_Y = 100;
+
+const BUTTON_W = 45;
+const BUTTON_H = 45;
+const BUTTON_GAP = 10;
+const BUTTON_Y = 900;
+
+const BOARD_X = (W - COLS * CELL) / 2;
+
+let chocolate = {};
+let board = [];
+let currentPiece;
+let nextPiece;
+let gameFont;
+
+let paused = false;
+let loadedAssets = 0;
+const TOTAL_ASSETS = 4;          // Icon + 3 Schokoladenbilder
+let loadingStartTime = 0;
+const MIN_LOADING_TIME = 1500;   // Ladebildschirm mindestens 1,5 Sekunden (in ms)
+let failedFiles = [];
+let iconImage = null;
+const ICON_FILE = "icon.svg";   // Datei in den tetris-Ordner legen
+const HUB_URL = "../";          // später: Zurück zur Spieleauswahl
+
+let score = 0;
+let lines = 0;
+let level = 1;
+
+let gameState = "loading";
+let fallTimer = 0;
+let fallInterval = 700;
+let gameOverTime = 0;
+
+let particles = [];
+let clearRowsPending = [];
+let clearAnimationUntil = 0;
+
+let themeIndex = 0;
+let lastTime = 0;
+
+// Hintergrundfarben: Rot und Grün sind deine Originalfarben.
+// Die anderen drei sind vorläufige Platzhalter.
+const themes = [
+  { name: "MARZIPAN", color: "#E5183C" },
+  { name: "HASELNUSS", color: "#6bb53d" },
+  { name: "KNUSPERFLAKES", color: "#ffd220" },
+  { name: "ALPENMILCH", color: "#19b1e7" },
+  { name: "ERDBEER", color: "#E99AB2" }
+];
+
+// Jede Form besteht aus genau einer Schokoladensorte.
+// Die Bilder werden nicht eingefärbt oder miteinander gemischt.
+const shapes = [
+  {
+    name: "I",
+    cells: [[0,0],[1,0],[2,0],[3,0]],
+    image: "dark"
+  },
+  {
+    name: "O",
+    cells: [[0,0],[1,0],[0,1],[1,1]],
+    image: "milk"
+  },
+  {
+    name: "T",
+    cells: [[0,0],[1,0],[2,0],[1,1]],
+    image: "white"
+  },
+  {
+    name: "S",
+    cells: [[1,0],[2,0],[0,1],[1,1]],
+    image: "milk"
+  },
+  {
+    name: "Z",
+    cells: [[0,0],[1,0],[1,1],[2,1]],
+    image: "dark"
+  },
+  {
+    name: "J",
+    cells: [[0,0],[0,1],[1,1],[2,1]],
+    image: "white"
+  },
+  {
+    name: "L",
+    cells: [[2,0],[0,1],[1,1],[2,1]],
+    image: "milk"
+  }
+];
+
+
+function setup() {
+  createCanvas(W, H);
+
+  fitCanvasToScreen();
+
+  setTimeout(setupTouchControls, 100);
+
+  imageMode(CORNER);
+  gameFont = "futura-pt";
+  textFont(gameFont);
+  noStroke();
+
+  loadingStartTime = millis();
+
+  let iconEl = new Image();
+  iconEl.onload = () => {
+    iconImage = iconEl;
+    loadedAssets++;
+  };
+  iconEl.onerror = () => loadFail(ICON_FILE);
+  iconEl.src = ICON_FILE;
+
+  loadChocolate("milk", "schoki-vollmilch.png");
+  loadChocolate("dark", "schoki-dunkel.png");
+  loadChocolate("white", "schoki-weiss.png");
+}
+
+function drawLoadingScreen() {
+  background("#24264f");
+
+  const size = 150;
+  const cx = W / 2;
+  const cy = H / 2 - 30;
+
+  // Icon in der Mitte
+  if (iconImage) {
+    drawingContext.drawImage(iconImage, cx - size / 2, cy - size / 2, size, size);
+  }
+
+  // Ladebalken
+  const barW = 250;
+  const barH = 8;
+  const barX = cx - barW / 2;
+  const barY = cy + size / 2 + 40;
+
+  const timeProgress = constrain((millis() - loadingStartTime) / MIN_LOADING_TIME, 0, 1);
+  const assetProgress = loadedAssets / TOTAL_ASSETS;
+  const progress = min(timeProgress, assetProgress);
+
+  noStroke();
+  fill("#383a68");
+  rect(barX, barY, barW, barH, 4);
+
+  fill("#e5183c");
+  rect(barX, barY, barW * progress, barH, 4);
+
+  // Fehlende Dateien anzeigen, damit der Fehler auch am Handy sichtbar ist
+  if (failedFiles.length > 0) {
+    textAlign(CENTER, CENTER);
+    textStyle(BOLD);
+    textSize(16);
+    fill("#ff6b6b");
+    text("Datei nicht gefunden:", W / 2, barY + 60);
+
+    textStyle(NORMAL);
+    textSize(14);
+    fill(255);
+    for (let i = 0; i < failedFiles.length; i++) {
+      text(failedFiles[i], W / 2, barY + 86 + i * 22);
+    }
+  }
+}
+
+function updateLoading() {
+  if (
+    loadedAssets >= TOTAL_ASSETS &&
+    millis() - loadingStartTime >= MIN_LOADING_TIME
+  ) {
+    resetGame();   // startet das Spiel
+  }
+}
+
+function loadChocolate(key, file) {
+  loadImage(
+    file,
+    img => { chocolate[key] = img; loadedAssets++; },
+    () => loadFail(file)
+  );
+}
+
+function loadFail(name) {
+  console.error("Bild nicht gefunden: " + name);
+  failedFiles.push(name);
+}
+
+function resetGame() {
+  board = [];
+  gameOverTime = 0;
+
+  for (let y = 0; y < ROWS; y++) {
+    board.push(Array(COLS).fill(null));
+  }
+
+  score = 0;
+  paused = false;
+  lines = 0;
+  level = 1;
+  fallTimer = 0;
+  fallInterval = 700;
+
+  particles = [];
+  clearRowsPending = [];
+  clearAnimationUntil = 0;
+
+  nextPiece = makePiece();
+  spawnPiece();
+
+  gameState = "playing";
+}
+
+function makePiece() {
+  const definition = random(shapes);
+
+  return {
+    name: definition.name,
+    cells: definition.cells.map(c => [...c]),
+    image: definition.image,
+    x: 3,
+    y: 0
+  };
+}
+
+function spawnPiece() {
+  currentPiece = nextPiece;
+  currentPiece.x = 3;
+  currentPiece.y = 0;
+
+  nextPiece = makePiece();
+
+  if (collides(currentPiece, 0, 0, currentPiece.cells)) {
+    gameState = "over";
+  }
+}
+
+function draw() {
+  if (gameState === "loading") {
+    updateLoading();
+    if (gameState === "loading") {
+      drawLoadingScreen();
+      return;
+    }
+  }
+
+  const dt = min(deltaTime, 50);
+  lastTime += dt;
+
+  background(themes[themeIndex].color);
+  textFont(gameFont);
+
+  drawHeader();
+  drawBoard();
+  drawParticles();
+  drawNextPiece();
+  drawFooter();
+
+  if (gameState === "playing") {
+    if (!paused && millis() >= clearAnimationUntil) {
+      if (clearRowsPending.length > 0) {
+        finishRowClear();
+      }
+
+      if (clearRowsPending.length === 0) {
+        fallTimer += dt;
+
+        if (fallTimer >= fallInterval) {
+          fallTimer = 0;
+          stepDown();
+        }
+      }
+    }
+
+    if (clearRowsPending.length > 0) {
+      drawClearingRows();
+    }
+  }
+
+  if (gameState === "menu") {
+    drawOverlay(
+      "SCHOKO TETRIS",
+      "Ordne deine Schokowürfel!",
+      "TIPPE ZUM STARTEN"
+    );
+  }
+
+  if (gameState === "over") {
+    if (gameOverTime === 0) gameOverTime = millis();
+    drawGameOver();
+  }
+
+  if (paused && gameState === "playing") {
+    fill(0, 0, 0, 170);
+    rect(BOARD_X - 5, BOARD_Y - 5, COLS * CELL + 10, ROWS * CELL + 10, 7);
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textStyle(BOLD);
+    textSize(40);
+    text("PAUSE", W / 2, BOARD_Y + (ROWS * CELL) / 2);
+    textStyle(NORMAL);
+  }
+}
+
+function drawHeader() {
+  noStroke();
+  fill(255);
+
+  // Punkte oben links
+  textAlign(LEFT, CENTER);
+  textStyle(NORMAL);
+  textSize(14);
+  text("PUNKTE", 20, 26);
+  textStyle(BOLD);
+  textSize(34);
+  text(String(score), 20, 54);
+
+  // Sorte mittig, fett
+  textAlign(CENTER, CENTER);
+  textStyle(BOLD);
+  textSize(22);
+  text(themes[themeIndex].name, W / 2, HEADER_H / 2);
+  textStyle(NORMAL);
+
+  // Pause-Symbol
+  const pb = getPauseBounds();
+  fill(255);
+  rect(pb.x + pb.w / 2 - 13, pb.y + pb.h / 2 - 17, 9, 34, 3);
+  rect(pb.x + pb.w / 2 + 4,  pb.y + pb.h / 2 - 17, 9, 34, 3);
+
+  // Logo
+  const ib = getIconBounds();
+  if (iconImage) {
+    drawingContext.drawImage(iconImage, ib.x, ib.y, ib.w, ib.h);
+  }
+}
+
+function getIconBounds() {
+  const size = 56;
+  return { x: W - size - 20, y: (HEADER_H - size) / 2, w: size, h: size };
+}
+
+function getPauseBounds() {
+  const ib = getIconBounds();
+  return { x: ib.x - 12 - 56, y: (HEADER_H - 60) / 2, w: 56, h: 60 };
+}
+
+function hitRect(px, py, b) {
+  return px >= b.x && px <= b.x + b.w && py >= b.y && py <= b.y + b.h;
+}
+
+function drawBoard() {
+  // Dunkles, leicht transparentes Spielfeld
+  fill(0, 0, 0, 65);
+  rect(BOARD_X - 5, BOARD_Y - 5, COLS * CELL + 10, ROWS * CELL + 10, 7);
+
+  // Rasterlinien
+  stroke(255, 255, 255, 24);
+  strokeWeight(1);
+
+  for (let x = 0; x <= COLS; x++) {
+    line(
+      BOARD_X + x * CELL,
+      BOARD_Y,
+      BOARD_X + x * CELL,
+      BOARD_Y + ROWS * CELL
+    );
+  }
+
+  for (let y = 0; y <= ROWS; y++) {
+    line(
+      BOARD_X,
+      BOARD_Y + y * CELL,
+      BOARD_X + COLS * CELL,
+      BOARD_Y + y * CELL
+    );
+  }
+
+  noStroke();
+
+  // Bereits gestapelte Würfel
+  for (let y = 0; y < ROWS; y++) {
+    for (let x = 0; x < COLS; x++) {
+      if (board[y][x]) {
+        drawChocolateCube(
+          BOARD_X + x * CELL,
+          BOARD_Y + y * CELL,
+          CELL,
+          board[y][x]
+        );
+      }
+    }
+  }
+
+  if (currentPiece && gameState === "playing") {
+    // Schatten zeigt, wo der Stein landen wird.
+    const ghostY = getGhostY(currentPiece);
+
+    for (const [cx, cy] of currentPiece.cells) {
+      const x = currentPiece.x + cx;
+      const y = ghostY + cy;
+
+      if (y >= 0) {
+        noFill();
+        stroke(255, 255, 255, 90);
+        strokeWeight(1.5);
+        rect(
+          BOARD_X + x * CELL + 3,
+          BOARD_Y + y * CELL + 3,
+          CELL - 6,
+          CELL - 6,
+          4
+        );
+        noStroke();
+      }
+    }
+
+    // Aktuell fallende Form
+    for (const [cx, cy] of currentPiece.cells) {
+      const x = currentPiece.x + cx;
+      const y = currentPiece.y + cy;
+
+      if (y >= 0) {
+        drawChocolateCube(
+          BOARD_X + x * CELL,
+          BOARD_Y + y * CELL,
+          CELL,
+          currentPiece.image
+        );
+      }
+    }
+  }
+}
+
+function drawChocolateCube(x, y, size, imageKey) {
+  const img = chocolate[imageKey];
+
+  if (img && img.width > 0) {
+    // Die Originaltextur bleibt erhalten.
+    image(img, x + 1, y + 1, size - 2, size - 2);
+  } else {
+    // Fallback, falls ein Bild nicht geladen wurde.
+    fill(100, 55, 35);
+    rect(x + 1, y + 1, size - 2, size - 2, 4);
+  }
+}
+
+function drawNextPiece() {
+  if (!nextPiece) return;
+
+  const centerX = W / 2;
+   const labelY = 724;
+  const topY = 744;
+  const previewCell = 18;
+
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textStyle(BOLD);
+  textSize(13);
+  text("NÄCHSTE FORM", centerX, labelY);
+  textStyle(NORMAL);
+
+  const maxX = max(...nextPiece.cells.map(c => c[0])) + 1;
+
+  const startX = centerX - maxX * previewCell / 2;
+  const startY = topY;
+
+  for (const [cx, cy] of nextPiece.cells) {
+    drawChocolateCube(
+      startX + cx * previewCell,
+      startY + cy * previewCell,
+      previewCell,
+      nextPiece.image
+    );
+  }
+}
+
+
+function drawFooter() {
+  fill(255, 235);
+  textAlign(CENTER, CENTER);
+  textStyle(NORMAL);
+  textSize(13);
+
+  text("← → Wischen: Bewegen     Tippen: Drehen", W / 2, 826);
+  text("Schnell nach unten wischen: Sofort Fallen", W / 2, 846);
+
+  textSize(11);
+  text("HINTERGRUND ÄNDERN", W / 2, 884);
+
+  const totalWidth = 5 * BUTTON_W + 4 * BUTTON_GAP;
+  const startX = (W - totalWidth) / 2;
+
+  for (let i = 0; i < 5; i++) {
+    const bx = startX + i * (BUTTON_W + BUTTON_GAP);
+
+    fill(themes[i].color);
+    stroke(255);
+    strokeWeight(themeIndex === i ? 3 : 1);
+    rect(bx, BUTTON_Y, BUTTON_W, BUTTON_H, 5);
+
+    noStroke();
+    fill(255);
+    textSize(14);
+    text(String(i + 1), bx + BUTTON_W / 2, BUTTON_Y + BUTTON_H / 2);
+  }
+}
+
+function drawOverlay(title, subtitle, instruction) {
+  fill(0, 0, 0, 175);
+  rect(0, 0, W, H);
+
+  fill(255);
+  textAlign(CENTER, CENTER);
+
+  textStyle(BOLD);
+  textSize(36);
+  text(title, W / 2, H / 2 - 65);
+
+  textStyle(NORMAL);
+  textSize(17);
+  text(subtitle, W / 2, H / 2 - 18);
+
+  textSize(13);
+  text(instruction, W / 2, H / 2 + 35);
+
+  textSize(12);
+ // text("Hintergrund mit 1–5 wählen", W / 2, H / 2 + 68);
+}
+
+function drawGameOver() {
+  fill(0, 0, 0, 180);
+  noStroke();
+  rect(0, 0, W, H);
+
+  // Farbe der gewählten Sorte
+  const levelColor = themes[themeIndex].color;
+
+  textAlign(CENTER, CENTER);
+  textStyle(BOLD);
+
+  // GAME OVER als Zweizeiler, riesig
+  fill(levelColor);
+  textSize(150);
+  text("GAME", W / 2, H / 2 - 165);
+  text("OVER", W / 2, H / 2 - 45);
+
+  fill(255);
+  textSize(24);
+  text("Punkte: " + score, W / 2, H / 2 + 40);
+
+  textStyle(NORMAL);
+  textSize(16);
+  text("TIPPE ZUM NEUSTARTEN", W / 2, H / 2 + 80);
+
+  // Button
+  const b = getMenuButtonBounds();
+  fill("#e5183c");
+  rect(b.x, b.y, b.w, b.h, 15);
+
+  fill(255);
+  textStyle(BOLD);
+  textSize(17);
+  text("ZUR SPIELAUSWAHL", b.x + b.w / 2, b.y + b.h / 2);
+  textStyle(NORMAL);
+}
+
+function getMenuButtonBounds() {
+  const w = 300;
+  const h = 50;
+  return { x: (W - w) / 2, y: H / 2 + 130, w: w, h: h };
+}
+
+function collides(piece, dx, dy, cells) {
+  for (const [cx, cy] of cells) {
+    const x = piece.x + cx + dx;
+    const y = piece.y + cy + dy;
+
+    if (x < 0 || x >= COLS || y >= ROWS) return true;
+
+    if (y >= 0 && board[y][x] !== null) return true;
+  }
+
+  return false;
+}
+
+function stepDown() {
+  if (!currentPiece || clearRowsPending.length > 0) return;
+
+  if (!collides(currentPiece, 0, 1, currentPiece.cells)) {
+    currentPiece.y++;
+  } else {
+    lockPiece();
+  }
+}
+
+function lockPiece() {
+  for (const [cx, cy] of currentPiece.cells) {
+    const x = currentPiece.x + cx;
+    const y = currentPiece.y + cy;
+
+    if (y < 0) {
+      gameState = "over";
+      return;
+    }
+
+    board[y][x] = currentPiece.image;
+  }
+
+  checkFullRows();
+
+  if (clearRowsPending.length === 0) {
+    spawnPiece();
+  }
+}
+
+function checkFullRows() {
+  clearRowsPending = [];
+
+  for (let y = 0; y < ROWS; y++) {
+    if (board[y].every(cell => cell !== null)) {
+      clearRowsPending.push(y);
+    }
+  }
+
+  if (clearRowsPending.length === 0) return;
+
+  // Für jeden Würfel der vollen Reihen Schokobrösel erzeugen.
+  for (const row of clearRowsPending) {
+    for (let x = 0; x < COLS; x++) {
+      const px = BOARD_X + x * CELL + CELL / 2;
+      const py = BOARD_Y + row * CELL + CELL / 2;
+
+      createCrumbs(px, py, board[row][x]);
+    }
+  }
+
+  const count = clearRowsPending.length;
+
+  score += [0, 100, 300, 500, 800][count] * level;
+  lines += count;
+  level = floor(lines / 10) + 1;
+  fallInterval = max(100, 700 - (level - 1) * 55);
+
+  // Kurze Verzögerung für den Zerbröckel-Effekt.
+  clearAnimationUntil = millis() + 420;
+}
+
+function drawClearingRows() {
+  const remaining = max(0, clearAnimationUntil - millis());
+  const alpha = map(remaining, 420, 0, 255, 0);
+
+  noStroke();
+  fill(255, alpha * 0.5);
+
+  for (const row of clearRowsPending) {
+    rect(
+      BOARD_X,
+      BOARD_Y + row * CELL,
+      COLS * CELL,
+      CELL
+    );
+  }
+}
+
+function finishRowClear() {
+  const cleared = new Set(clearRowsPending);
+
+  board = board.filter((row, index) => !cleared.has(index));
+
+  while (board.length < ROWS) {
+    board.unshift(Array(COLS).fill(null));
+  }
+
+  clearRowsPending = [];
+  clearAnimationUntil = 0;
+
+  spawnPiece();
+}
+
+function createCrumbs(x, y, imageKey) {
+  for (let i = 0; i < 10; i++) {
+    particles.push({
+      x: x + random(-8, 8),
+      y: y + random(-8, 8),
+      vx: random(-3.5, 3.5),
+      vy: random(-4, 1),
+      size: random(2, 6),
+      life: 255,
+      image: imageKey,
+      rotation: random(TWO_PI),
+      spin: random(-0.15, 0.15)
+    });
+  }
+}
+
+function drawParticles() {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.12;
+    p.vx *= 0.99;
+    p.rotation += p.spin;
+    p.life -= 5;
+
+    push();
+    translate(p.x, p.y);
+    rotate(p.rotation);
+    tint(255, max(0, p.life));
+
+    const img = chocolate[p.image];
+
+    if (img && img.width > 0) {
+      imageMode(CENTER);
+      image(img, 0, 0, p.size, p.size);
+      imageMode(CORNER);
+    } else {
+      noStroke();
+      fill(90, 45, 25, p.life);
+      rectMode(CENTER);
+      rect(0, 0, p.size, p.size);
+      rectMode(CORNER);
+    }
+
+    noTint();
+    pop();
+
+    if (p.life <= 0) {
+      particles.splice(i, 1);
+    }
+  }
+}
+
+function getGhostY(piece) {
+  let y = piece.y;
+
+  while (!collides(piece, 0, y - piece.y + 1, piece.cells)) {
+    y++;
+  }
+
+  return y;
+}
+
+function rotatePiece() {
+  if (!currentPiece || clearRowsPending.length > 0) return;
+
+  const rotated = currentPiece.cells.map(([x, y]) => [y, -x]);
+
+  const minX = min(...rotated.map(c => c[0]));
+  const minY = min(...rotated.map(c => c[1]));
+
+  const normalized = rotated.map(([x, y]) => [x - minX, y - minY]);
+
+  if (!collides(currentPiece, 0, 0, normalized)) {
+    currentPiece.cells = normalized;
+  }
+}
+
+
+let touchStartX = 0;
+let touchStartY = 0;
+let touchStartTime = 0;
+
+function setupTouchControls() {
+  const canvas = document.querySelector("canvas");
+  if (!canvas || canvas.dataset.touchReady) return;
+
+  canvas.dataset.touchReady = "true";
+  canvas.style.touchAction = "none";
+
+  canvas.addEventListener("pointerdown", function(event) {
+    if (event.pointerType !== "touch") return;
+
+    event.preventDefault();
+
+    const rect = canvas.getBoundingClientRect();
+
+    touchStartX = (event.clientX - rect.left) * W / rect.width;
+    touchStartY = (event.clientY - rect.top) * H / rect.height;
+    touchStartTime = performance.now();
+  });
+
+  canvas.addEventListener("pointerup", function(event) {
+    if (event.pointerType !== "touch") return;
+
+    event.preventDefault();
+
+    const rect = canvas.getBoundingClientRect();
+
+    const endX = (event.clientX - rect.left) * W / rect.width;
+    const endY = (event.clientY - rect.top) * H / rect.height;
+        if (gameState === "loading") return;
+
+        // Logo: zurück zur Spieleauswahl
+    if (hitRect(endX, endY, getIconBounds())) {
+      window.location.href = HUB_URL;
+      return;
+    }
+
+    // Pause-Button
+    if (hitRect(endX, endY, getPauseBounds())) {
+      if (gameState === "playing" && clearRowsPending.length === 0) {
+        paused = !paused;
+      }
+      return;
+    }
+
+       // Farbbuttons antippen
+    const totalWidth = 5 * BUTTON_W + 4 * BUTTON_GAP;
+    const startX = (W - totalWidth) / 2;
+
+    if (
+      endY >= BUTTON_Y &&
+      endY <= BUTTON_Y + BUTTON_H &&
+      endX >= startX &&
+      endX <= startX + totalWidth
+    ) {
+      const relativeX = endX - startX;
+      const buttonIndex = Math.floor(relativeX / (BUTTON_W + BUTTON_GAP));
+
+      if (
+        buttonIndex >= 0 &&
+        buttonIndex < 5 &&
+        relativeX % (BUTTON_W + BUTTON_GAP) <= BUTTON_W
+      ) {
+        themeIndex = buttonIndex;
+      }
+
+      return;
+    }
+
+if (gameState === "over") {
+  if (hitRect(endX, endY, getMenuButtonBounds())) {
+    window.location.href = HUB_URL;
+  } else if (millis() - gameOverTime > 700) {
+    resetGame();
+  }
+  return;
+}
+
+if (gameState === "menu") {
+  resetGame();
+  return;
+}
+
+if (gameState !== "playing" || clearRowsPending.length > 0 || paused) return;
+
+    const dx = endX - touchStartX;
+    const dy = endY - touchStartY;
+    const duration = performance.now() - touchStartTime;
+
+    if (Math.abs(dx) < 20 && Math.abs(dy) < 20) {
+      rotatePiece();
+    } else if (Math.abs(dx) > Math.abs(dy)) {
+      const direction = dx < 0 ? -1 : 1;
+      const steps = Math.max(1, Math.round(Math.abs(dx) / 35));
+
+      for (let i = 0; i < steps; i++) {
+        if (collides(currentPiece, direction, 0, currentPiece.cells)) break;
+        currentPiece.x += direction;
+      }
+      } else if (dy > 0) {
+      if (duration < 300 && dy > 80) {
+        // Schneller Wisch nach unten: sofort fallen lassen
+        while (!collides(currentPiece, 0, 1, currentPiece.cells)) {
+          currentPiece.y++;
+        }
+        lockPiece();
+      } else {
+        // Langsames Ziehen: feldweise nach unten
+        const steps = Math.max(1, Math.round(dy / 35));
+
+        for (let i = 0; i < steps; i++) {
+          stepDown();
+          if (gameState !== "playing") break;
+        }
+      }
+    } else {
+      rotatePiece();
+    }
+  });
+}
+
+
+
+function keyPressed(event) {
+    if (gameState === "loading") return false;
+  // Neustart oder Spiel starten
+  if (gameState === "menu" || gameState === "over") {
+    if (event.key === "Enter" || event.code === "Space") {
+      resetGame();
+      return false;
+    }
+  }
+
+  // Neustart mit R
+  if (event.key.toLowerCase() === "r") {
+    resetGame();
+    return false;
+  }
+
+  // Hintergrundfarbe mit 1 bis 5 ändern
+  if (event.key >= "1" && event.key <= "5") {
+    themeIndex = Number(event.key) - 1;
+    return false;
+  }
+
+  // Pause mit P
+  if (event.key.toLowerCase() === "p" && gameState === "playing") {
+    paused = !paused;
+    return false;
+  }
+
+  // Steuerung nur während des Spiels
+  if (gameState !== "playing" || clearRowsPending.length > 0 || paused) {
+    return false;
+  }
+
+  // Nach links
+  if (event.code === "ArrowLeft") {
+    if (!collides(currentPiece, -1, 0, currentPiece.cells)) {
+      currentPiece.x--;
+    }
+  }
+
+  // Nach rechts
+  if (event.code === "ArrowRight") {
+    if (!collides(currentPiece, 1, 0, currentPiece.cells)) {
+      currentPiece.x++;
+    }
+  }
+
+  // Schneller nach unten
+  if (event.code === "ArrowDown") {
+    stepDown();
+  }
+
+  // Drehen
+  if (event.code === "ArrowUp") {
+    rotatePiece();
+  }
+
+  // Sofort nach unten fallen lassen
+  if (event.code === "Space") {
+    while (!collides(currentPiece, 0, 1, currentPiece.cells)) {
+      currentPiece.y++;
+    }
+    lockPiece();
+  }
+
+  return false;
+  
+}
+
+
+function windowResized() {
+  fitCanvasToScreen();
+}
+
+
+function fitCanvasToScreen() {
+  const canvas = document.querySelector("canvas");
+  if (!canvas) return;
+
+  const scale = Math.min(
+    window.innerWidth / W,
+    window.innerHeight / H
+  );
+
+  canvas.style.position = "fixed";
+  canvas.style.width = `${W * scale}px`;
+  canvas.style.height = `${H * scale}px`;
+  canvas.style.left = "50%";
+  canvas.style.top = "50%";
+  canvas.style.margin = "0";
+  canvas.style.transform = "translate(-50%, -50%)";
+  canvas.style.display = "block";
+  canvas.style.maxWidth = "none";
+  canvas.style.maxHeight = "none";
+
+  document.body.style.margin = "0";
+  document.body.style.padding = "0";
+  document.body.style.width = "100%";
+  document.body.style.height = "100%";
+  document.body.style.overflow = "hidden";
+  document.body.style.background = "#111";
+  
+}
