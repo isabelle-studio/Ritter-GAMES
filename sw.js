@@ -15,8 +15,8 @@ const FILES = [
   "snake/level-haselnuss.svg", "snake/level-knusperflakes.svg",
   "snake/level-marzipan.svg",
 
-  "tetris/", "tetris/index.html", "tetris/style.css", "tetris/sketch.js",
-  "tetris/icon.svg",
+  "tetris/", "tetris/index.html", "tetris/style.css", "tetris/sketch.js", "tetris/p5.js", 
+  "tetris/icon.svg", 
   "tetris/schoki-dunkel.png", "tetris/schoki-vollmilch.png", "tetris/schoki-weiss.png"
 ];
 
