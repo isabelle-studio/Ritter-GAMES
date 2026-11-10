@@ -21,6 +21,12 @@ let swipeStartY = 0;
 let gameOverTime = 0;
 let paused = false;
 let showExitPopup = false;
+let failedFiles = [];
+
+function loadFail(name) {
+  console.error("Bild nicht gefunden: " + name);
+  failedFiles.push(name);
+}
 
 function fitCanvas() {
   let s = min(windowWidth / 1080, windowHeight / 1920);
@@ -125,6 +131,7 @@ let score = 0;
 
 function setup() {
   createCanvas(1080, 1920);
+  pixelDensity(1);
   fitCanvas();
   setupTouchInput();
 
@@ -137,7 +144,7 @@ function setup() {
   // Icon für den Zurück-Button laden
   let iconEl = new Image();
   iconEl.onload = () => { iconImage = iconEl; };
-  iconEl.onerror = () => console.error("Bild nicht gefunden: " + iconFile);
+  iconEl.onerror = () => loadFail(iconFile);
   iconEl.src = iconFile;
 
   // Schokoladenbilder laden
@@ -167,7 +174,7 @@ function setup() {
       levelImagesLoaded++;
       loadedAssets++;
     };
-    el.onerror = () => console.error("Bild nicht gefunden: " + card.file);
+    el.onerror = () => loadFail(card.file);
     el.src = card.file;
   }
 }
@@ -206,7 +213,7 @@ function draw() {
   }
 
   if (gameOver && gameOverTime === 0) gameOverTime = millis();
- if (!gameOver && !paused) {
+if (!gameOver && !paused && !showExitPopup) {
   handleControls();
   moveSnake();
 }
@@ -215,6 +222,7 @@ function draw() {
   drawFood();
   drawSnake();
   drawChocolateParticles();
+    drawBackIcon();
   drawScore();
 
   if (gameOver) {
@@ -393,6 +401,11 @@ function handleTap(px, py) {
 
   // Im Menü: Sorte auswählen und starten
   if (!gameStarted) {
+    if (hitTest(px, py, getIconBounds())) {
+      window.location.href = "../menu.html";
+      return;
+    }
+
     if (transitionCard !== -1) return;   // während der Animation keine weiteren Klicks
 
     for (let i = 0; i < levelCards.length; i++) {
@@ -407,32 +420,34 @@ function handleTap(px, py) {
     return;
   }
 
-if (hitTest(px, py, getIconBounds())) {
-  showExitPopup = true;
-  return;
-}
-
+  // Beenden-Popup hat Vorrang
   if (showExitPopup) {
-
-  if (hitTest(px, py, getPopupLevelButton())) {
-    showExitPopup = false;
-    backToMenu();
+    if (hitTest(px, py, getPopupLevelButton())) {
+      showExitPopup = false;
+      backToMenu();
+      return;
+    }
+    if (hitTest(px, py, getPopupMainMenuButton())) {
+      window.location.href = "../menu.html";
+      return;
+    }
+    showExitPopup = false;   // Tipp daneben schließt das Popup
     return;
   }
 
-  if (hitTest(px, py, getPopupMainMenuButton())) {
-    window.location.href = "../menu.html";
+  // Icon: Popup öffnen
+  if (hitTest(px, py, getIconBounds())) {
+    showExitPopup = true;
     return;
   }
 
-}
-  
+  // Pause-Button
   if (hitTest(px, py, getPauseButtonBounds())) {
-  paused = !paused;
-  return;
-}
+    paused = !paused;
+    return;
+  }
 
-    // Game Over: Button zur Sortenauswahl, sonst Tippen = Neustart
+  // Game Over: Button zur Sortenauswahl, sonst Tippen = Neustart
   if (gameOver) {
     if (hitTest(px, py, getMenuButtonBounds())) {
       backToMenu();
@@ -467,7 +482,7 @@ function setupTouchInput() {
   c.addEventListener("pointermove", e => {
     e.preventDefault();
     if (e.buttons === 0) return;                       // Finger/Maus nicht gedrückt
-    if (!gameStarted || gameOver || !direction) return;
+   if (!gameStarted || gameOver || paused || showExitPopup || !direction) return;
 
     let p = toCanvas(e);
     let dx = p.x - swipeStartX;
