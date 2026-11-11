@@ -35,23 +35,27 @@ const Erfolge = (function () {
 
     // ---- TETRIS: Reihen insgesamt ----
     { id: "tetris_reihen_10",  gruppe: "tetris", name: "Aufräumer",           desc: "Entferne insgesamt 10 Reihen",  art: "summe", zaehler: "tetris_reihen", ziel: 10 },
-    { id: "tetris_reihen_50",  gruppe: "tetris", name: "Reihenhaus-Besitzer", desc: "Entferne insgesamt 50 Reihen",  art: "summe", zaehler: "tetris_reihen", ziel: 50 },
-    { id: "tetris_reihen_100", gruppe: "tetris", name: "Bauarbeiter",         desc: "Entferne insgesamt 100 Reihen", art: "summe", zaehler: "tetris_reihen", ziel: 100 },
+    { id: "tetris_reihen_50",  gruppe: "tetris", name: "Reihenhaus-Besitzerin", desc: "Entferne insgesamt 50 Reihen",  art: "summe", zaehler: "tetris_reihen", ziel: 50 },
+    { id: "tetris_reihen_100", gruppe: "tetris", name: "Bauarbeiterin",         desc: "Entferne insgesamt 100 Reihen", art: "summe", zaehler: "tetris_reihen", ziel: 100 },
     { id: "tetris_reihen_500", gruppe: "tetris", name: "Abrissbirne",         desc: "Entferne insgesamt 500 Reihen", art: "summe", zaehler: "tetris_reihen", ziel: 500 },
     // ---- TETRIS: 4 Reihen auf einmal ----
     { id: "tetris_vier", gruppe: "tetris", name: "Tetris-Treffer", desc: "Entferne 4 Reihen auf einmal", art: "best", zaehler: "tetris_reihen_auf_einmal", ziel: 4 },
     // ---- TETRIS: Scores ----
-    { id: "tetris_1000",  gruppe: "tetris", name: "Klötzchen-Kenner",      desc: "Erreiche 1.000 Punkte in Tetris",  art: "best", zaehler: "tetris_score", ziel: 1000 },
-    { id: "tetris_5000",  gruppe: "tetris", name: "Stapelkünstler",        desc: "Erreiche 5.000 Punkte in Tetris",  art: "best", zaehler: "tetris_score", ziel: 5000 },
+    { id: "tetris_200", gruppe: "tetris", name: "Probierpaket",     desc: "Erreiche 200 Punkte in Tetris", art: "best", zaehler: "tetris_score", ziel: 200 },
+    { id: "tetris_400", gruppe: "tetris", name: "Würfelzählerin",      desc: "Erreiche 400 Punkte in Tetris", art: "best", zaehler: "tetris_score", ziel: 400 },
+    { id: "tetris_600", gruppe: "tetris", name: "Würfel-Lehrling", desc: "Erreiche 600 Punkte in Tetris", art: "best", zaehler: "tetris_score", ziel: 600 },
+    { id: "tetris_800", gruppe: "tetris", name: "Reihenjägerin",       desc: "Erreiche 800 Punkte in Tetris", art: "best", zaehler: "tetris_score", ziel: 800 },
+    { id: "tetris_1000",  gruppe: "tetris", name: "Würfel-Kenner",      desc: "Erreiche 1.000 Punkte in Tetris",  art: "best", zaehler: "tetris_score", ziel: 1000 },
+    { id: "tetris_5000",  gruppe: "tetris", name: "Stapelkünstlerin",        desc: "Erreiche 5.000 Punkte in Tetris",  art: "best", zaehler: "tetris_score", ziel: 5000 },
     { id: "tetris_profi", gruppe: "tetris", name: "Tetris-Profi",          desc: "Erreiche 10.000 Punkte in Tetris", art: "best", zaehler: "tetris_score", ziel: 10000 },
     { id: "tetris_25000", gruppe: "tetris", name: "Schokoladen-Architekt", desc: "Erreiche 25.000 Punkte in Tetris", art: "best", zaehler: "tetris_score", ziel: 25000 },
 
     // ---- SORTEN (Snake) ----
-    { id: "sorte_marzipan",      gruppe: "sorten", name: "Marzipan-Probierer", desc: "Spiele Snake in der Sorte Marzipan",      art: "sammlung", zaehler: "snake_sorten", item: "marzipan" },
+    { id: "sorte_marzipan",      gruppe: "sorten", name: "Marzipan-Heldin", desc: "Spiele Snake in der Sorte Marzipan",      art: "sammlung", zaehler: "snake_sorten", item: "marzipan" },
     { id: "sorte_nuss",          gruppe: "sorten", name: "Nuss-Knacker",       desc: "Spiele Snake in der Sorte Haselnuss",     art: "sammlung", zaehler: "snake_sorten", item: "nuss" },
     { id: "sorte_alpenmilch",    gruppe: "sorten", name: "Alpenmilch-Fan",     desc: "Spiele Snake in der Sorte Alpenmilch",    art: "sammlung", zaehler: "snake_sorten", item: "alpenmilch" },
-    { id: "sorte_knusperflakes", gruppe: "sorten", name: "Flocken-Fan",        desc: "Spiele Snake in der Sorte Knusperflakes", art: "sammlung", zaehler: "snake_sorten", item: "knusperflakes" },
-    { id: "sorte_erdbeer",       gruppe: "sorten", name: "Erdbeer-Träumer",    desc: "Spiele Snake in der Sorte Erdbeer",       art: "sammlung", zaehler: "snake_sorten", item: "erdbeer" },
+    { id: "sorte_knusperflakes", gruppe: "sorten", name: "Knusper-Knäuschen",        desc: "Spiele Snake in der Sorte Knusperflakes", art: "sammlung", zaehler: "snake_sorten", item: "knusperflakes" },
+    { id: "sorte_erdbeer",       gruppe: "sorten", name: "Erdbeer-Träumerin",    desc: "Spiele Snake in der Sorte Erdbeer",       art: "sammlung", zaehler: "snake_sorten", item: "erdbeer" },
     { id: "sorte_alle",          gruppe: "sorten", name: "Chocolatier",        desc: "Spiele Snake in allen 5 Sorten",          art: "sammlung", zaehler: "snake_sorten", ziel: 5 },
 
     // ---- ALLGEMEIN ----
@@ -60,7 +64,7 @@ const Erfolge = (function () {
     { id: "spiele_50", gruppe: "allgemein", name: "Schoko-Süchtig", desc: "Spiele 50 Runden",        art: "summe", zaehler: "spiele_gesamt", ziel: 50 },
 
     // ---- META ----
-    { id: "meta_alle", gruppe: "meta", name: "Schokoladenkönig", desc: "Schalte alle anderen Erfolge frei", art: "meta", geheim: true }
+    { id: "meta_alle", gruppe: "meta", name: "Schokoladenkönigin", desc: "Schalte alle anderen Erfolge frei", art: "meta", geheim: true }
   ];
   // ============================================================
 
