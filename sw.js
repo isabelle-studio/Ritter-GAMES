@@ -1,4 +1,4 @@
-const CACHE = "ritter-v9";
+const CACHE = "ritter-v10";
 
 const FILES = [
   "./", "index.html", "loader.html", "menu.html", "manifest.json",
