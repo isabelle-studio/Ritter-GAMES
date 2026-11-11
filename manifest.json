@@ -2,7 +2,7 @@
 {
   "id": "./",
   "name": "Ritter Games",
-  "short_name": "Ritter",
+  "short_name": "Ritter Games",
   "start_url": "./menu.html",
   "scope": "./",
   "display": "standalone",
