@@ -1,12 +1,18 @@
-const CACHE = "ritter-v11";
+const CACHE = "ritter-v12";
 
 const FILES = [
   "./", "index.html", "loader.html", "menu.html", "manifest.json",
+  "erfolge.html", "achievements.js",
 
   "assets/icon-rot.png", "assets/icon-gruen.png", "assets/icon-gelb.png",
   "assets/icon-blau.png", "assets/icon-pink.png",
   "assets/icon-snake.png", "assets/icon-tetris.png",
   "assets/icon-192.png", "assets/icon-512.png", "assets/Jost.ttf",
+
+  "assets/erfolge-icon.png", "assets/erfolg-grau.png",
+  "assets/erfolg-gruen.png", "assets/erfolg-blau.png", "assets/erfolg-gelb.png",
+  "assets/erfolg-pink.png", "assets/erfolg-rot.png", "assets/erfolg-vollmilch.png",
+  "assets/erfolg-weiss.png", "assets/erfolg-zartbitter.png",
 
   "snake/", "snake/index.html", "snake/style.css", "snake/sketch.js",
   "snake/p5.js", "snake/p5.sound.min.js", "snake/icon.svg",
@@ -15,8 +21,8 @@ const FILES = [
   "snake/level-haselnuss.svg", "snake/level-knusperflakes.svg",
   "snake/level-marzipan.svg",
 
-  "tetris/", "tetris/index.html", "tetris/style.css", "tetris/sketch.js", "tetris/p5.js", 
-  "tetris/icon.svg", 
+  "tetris/", "tetris/index.html", "tetris/style.css", "tetris/sketch.js", "tetris/p5.js",
+  "tetris/icon.svg",
   "tetris/schoki-dunkel.png", "tetris/schoki-vollmilch.png", "tetris/schoki-weiss.png"
 ];
 
