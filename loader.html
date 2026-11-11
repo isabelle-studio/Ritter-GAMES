@@ -1,48 +1,45 @@
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="snake/icon-180.png">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" href="assets/icon-192.png">
 <meta name="theme-color" content="#24264f">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 
 <title>Ritter Games</title>
 
 <style>
-
-body{
-    margin:0;
-    background:#24264f;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
-    min-height:100vh;
-    min-height:100dvh;
-
-    overflow:hidden;
+body {
+    margin: 0;
+    background: #24264f;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: hidden;
 }
 
-#logo{
-    width:min(180px, 45vw);
-    height:auto;
-    display:block;
+#logo {
+    width: min(180px, 45vw);
+    height: auto;
+    display: block;
 }
-
 </style>
 </head>
 
 <body>
 
-<img id="logo" src="assets/icon-rot.png">
+<img id="logo" src="assets/icon-rot.png" alt="Ritter Games">
 
 <script>
-
-if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js");
+}
 
 const logos = [
     "assets/icon-rot.png",
@@ -52,30 +49,34 @@ const logos = [
     "assets/icon-pink.png"
 ];
 
-let current = 0;
-
-logos.forEach(src => { new Image().src = src; });
-
 const logo = document.getElementById("logo");
 
-setInterval(() => {
+async function startLoader() {
 
-    current++;
+    // Alle Icons vollständig laden
+    await Promise.all(logos.map(src => new Promise(resolve => {
+        const img = new Image();
+        img.onload = resolve;
+        img.onerror = resolve;
+        img.src = src;
+    })));
 
-    if(current >= logos.length){
-        current = 0;
-    }
+    let current = 0;
 
-    logo.src = logos[current];
+    // Farbwechsel
+    const animation = setInterval(() => {
+        current = (current + 1) % logos.length;
+        logo.src = logos[current];
+    }, 300);
 
-}, 300);
+    // Nach 2,5 Sekunden zum Menü
+    setTimeout(() => {
+        clearInterval(animation);
+        window.location.replace("menu.html");
+    }, 2500);
+}
 
-setTimeout(() => {
-
-  window.location.replace("menu.html");
-
-}, 2500);
-
+startLoader();
 </script>
 
 </body>
