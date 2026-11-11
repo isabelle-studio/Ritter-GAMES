@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html lang="de">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Erfolge</title>
 
 <style>
-
 body{
     margin:0;
     background:#24254f;
@@ -24,17 +21,21 @@ body{
 
 h1{
     text-align:center;
-    margin-bottom:40px;
+    margin-bottom:10px;
     font-weight:700;
+}
+
+.counter{
+    text-align:center;
+    opacity:0.8;
+    margin-bottom:40px;
 }
 
 .achievement{
     display:flex;
     align-items:center;
-
     margin-bottom:25px;
     padding:15px;
-
     background:rgba(255,255,255,0.05);
     border-radius:20px;
 }
@@ -43,6 +44,10 @@ h1{
     width:70px;
     height:70px;
     margin-right:20px;
+}
+
+.achievement.locked{
+    opacity:0.6;
 }
 
 .title{
@@ -54,62 +59,55 @@ h1{
     font-size:16px;
     opacity:0.8;
 }
-
 </style>
-
 </head>
 
 <body>
 
 <div class="container">
-
-<h1>ERFOLGE</h1>
-
-<div class="achievement">
-    <img src="assets/erfolg-gelb.png">
-   <div class="achievement">
-
-<img
-    id="ach-erste-schlange"
-    src="assets/erfolg-grau.png">
-
-<div>
-    <div class="title">
-        Erste Schlange
-    </div>
-
-    <div class="desc">
-        Erreiche 5 Punkte in Snake
-    </div>
+    <h1>ERFOLGE</h1>
+    <div class="counter" id="counter"></div>
+    <div id="list"></div>
 </div>
 
-</div>
-
-<div class="achievement">
-    <img src="assets/erfolg-grau.png">
-    <div>
-        <div class="title">Tetris-Profi</div>
-        <div class="desc">Erreiche 10.000 Punkte in Tetris</div>
-    </div>
-</div>
-
-</div>
 <script>
+// Hier alle Erfolge eintragen. Die id muss mit unlockAchievement("...") übereinstimmen.
+const ACHIEVEMENTS = [
+  { id: "erste_schlange", name: "Erste Schlange", desc: "Erreiche 5 Punkte in Snake" },
+  { id: "tetris_profi",   name: "Tetris-Profi",   desc: "Erreiche 10.000 Punkte in Tetris" }
+];
 
-const save =
-  JSON.parse(localStorage.getItem("ritterGames")) || {};
-
-const achievements =
-  save.achievements || {};
-
-if (achievements.erste_schlange) {
-
-  document.getElementById(
-    "ach-erste-schlange"
-  ).src = "assets/erfolg-gelb.png";
-
+function loadSave() {
+  try {
+    return JSON.parse(localStorage.getItem("ritterGames")) || {};
+  } catch (e) {
+    return {};
+  }
 }
 
+const unlocked = loadSave().achievements || {};
+const list = document.getElementById("list");
+let count = 0;
+
+ACHIEVEMENTS.forEach(a => {
+  const done = !!unlocked[a.id];
+  if (done) count++;
+
+  const el = document.createElement("div");
+  el.className = "achievement" + (done ? "" : " locked");
+  el.innerHTML = `
+    <img src="assets/${done ? "erfolg-gelb" : "erfolg-grau"}.png" alt="">
+    <div>
+      <div class="title">${a.name}</div>
+      <div class="desc">${a.desc}</div>
+    </div>
+  `;
+  list.appendChild(el);
+});
+
+document.getElementById("counter").textContent =
+  count + " / " + ACHIEVEMENTS.length + " freigeschaltet";
 </script>
+
 </body>
 </html>
