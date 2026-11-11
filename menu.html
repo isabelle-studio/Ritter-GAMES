@@ -95,9 +95,9 @@ h1{
 
     <div class="menu">
 
-  <a class="card" href="snake/">
-    <img src="assets/icon-snake.png" alt="Snake">
-    <div class="score" id="hs-snake">Highscore: 0</div>
+ <a class="card" href="erfolge.html">
+    <img src="assets/erfolge-icon.png" alt="Erfolge">
+    <div class="score" id="erfolge-zaehler"></div>
 </a>
 
 <a class="card" href="tetris/">
@@ -115,11 +115,15 @@ h1{
 </div>
 
 </div>
+<script src="achievements.js"></script>
 <script>
   try {
     const save = JSON.parse(localStorage.getItem("ritterGames")) || {};
     document.getElementById("hs-snake").textContent = "Highscore: " + (save.snakeHigh || 0);
     document.getElementById("hs-tetris").textContent = "Highscore: " + (save.tetrisHigh || 0);
+    const anzahl = Object.keys(save.achievements || {}).length;
+    document.getElementById("erfolge-zaehler").textContent =
+      anzahl + " / " + Erfolge.LISTE.length;
   } catch (e) {}
 </script>
 </body>
