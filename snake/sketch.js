@@ -739,9 +739,8 @@ function moveSnake() {
     snakeLength++;
     score++;
     
-    if (score >= 5) {
-  unlockAchievement("erste_schlange");
-}
+       Erfolge.zaehle("snake_gegessen");        // zählt insgesamt
+    Erfolge.bestwert("snake_rekord", score); // bester Wert dieser Runde
     spawnFood();
   }
 
@@ -1064,7 +1063,8 @@ function restartGame() {
   gameOverTime = 0;
   moveCounter = 0;
   particles = [];
-
+  Erfolge.zaehle("spiele_gesamt");
+  Erfolge.sammle("snake_sorten", selectedFlavor);
   spawnFood();
 }
 
