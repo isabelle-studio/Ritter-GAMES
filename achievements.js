@@ -9,9 +9,9 @@ const Erfolge = (function () {
   // Gruppen: Überschrift und Würfelfarbe
   const GRUPPEN = {
     snake:     { titel: "Snake",       bild: "erfolg-gruen" },
-    tetris:    { titel: "Tetris",      bild: "erfolg-blau" },
+    tetris:    { titel: "Tetris",      bild: "erfolg-zartbitter" },
     sorten:    { titel: "Sorten",      bild: "erfolg-pink" },
-    allgemein: { titel: "Allgemein",   bild: "erfolg-gelb" },
+    allgemein: { titel: "Allgemein",   bild: "erfolg-weiss" },
     meta:      { titel: "Königsklasse", bild: "erfolg-vollmilch" }
   };
 
