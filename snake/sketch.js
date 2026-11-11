@@ -1074,20 +1074,4 @@ function startGame() {
   restartGame();
   particles = keep;
 }
-
-function unlockAchievement(id) {
-
-  let save =
-    JSON.parse(localStorage.getItem("ritterGames")) || {};
-
-  if (!save.achievements) {
-    save.achievements = {};
-  }
-
-  save.achievements[id] = true;
-
-  localStorage.setItem(
-    "ritterGames",
-    JSON.stringify(save)
-  );
 }
