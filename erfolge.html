@@ -6,108 +6,119 @@
 <title>Erfolge</title>
 
 <style>
+@font-face {
+    font-family: "Jost";
+    src: url("assets/Jost-VariableFont_wght.ttf");
+    font-weight: 100 900;
+}
+
 body{
     margin:0;
     background:#24254f;
     color:white;
     font-family:"Jost", sans-serif;
 }
-
 .container{
     max-width:900px;
     margin:auto;
-    padding:40px 20px;
+    padding:30px 20px 60px;
 }
-
+.zurueck{
+    display:inline-block;
+    color:white;
+    text-decoration:none;
+    font-weight:700;
+    background:#383a68;
+    padding:10px 18px;
+    border-radius:14px;
+}
 h1{
     text-align:center;
-    margin-bottom:10px;
+    margin:20px 0 6px;
     font-weight:700;
 }
-
 .counter{
     text-align:center;
-    opacity:0.8;
-    margin-bottom:40px;
+    opacity:.8;
+    margin-bottom:30px;
 }
-
+h2{
+    margin:40px 0 15px;
+    font-weight:700;
+    font-size:26px;
+}
 .achievement{
     display:flex;
     align-items:center;
-    margin-bottom:25px;
-    padding:15px;
+    margin-bottom:14px;
+    padding:14px;
     background:rgba(255,255,255,0.05);
     border-radius:20px;
 }
-
 .achievement img{
     width:70px;
     height:70px;
     margin-right:20px;
+    flex-shrink:0;
 }
-
-.achievement.locked{
-    opacity:0.6;
+.achievement.locked .title,
+.achievement.locked .desc{
+    opacity:.55;
 }
-
-.title{
-    font-size:24px;
-    font-weight:700;
-}
-
-.desc{
-    font-size:16px;
-    opacity:0.8;
-}
+.title{ font-size:22px; font-weight:700; }
+.desc{ font-size:16px; opacity:.8; }
+.fortschritt{ font-size:14px; margin-top:4px; opacity:.6; }
 </style>
 </head>
 
 <body>
-
 <div class="container">
+    <a class="zurueck" href="menu.html">← Hauptmenü</a>
     <h1>ERFOLGE</h1>
     <div class="counter" id="counter"></div>
-    <div id="list"></div>
+    <div id="liste"></div>
 </div>
 
+<script src="achievements.js"></script>
 <script>
-// Hier alle Erfolge eintragen. Die id muss mit unlockAchievement("...") übereinstimmen.
-const ACHIEVEMENTS = [
-  { id: "erste_schlange", name: "Erste Schlange", desc: "Erreiche 5 Punkte in Snake" },
-  { id: "tetris_profi",   name: "Tetris-Profi",   desc: "Erreiche 10.000 Punkte in Tetris" }
-];
+const save = Erfolge.laden();
+const freigeschaltet = save.achievements || {};
+const liste = document.getElementById("liste");
+let anzahl = 0;
 
-function loadSave() {
-  try {
-    return JSON.parse(localStorage.getItem("ritterGames")) || {};
-  } catch (e) {
-    return {};
-  }
-}
+Object.keys(Erfolge.GRUPPEN).forEach(key => {
+  const gruppe = Erfolge.GRUPPEN[key];
+  const eintraege = Erfolge.LISTE.filter(a => a.gruppe === key);
+  if (eintraege.length === 0) return;
 
-const unlocked = loadSave().achievements || {};
-const list = document.getElementById("list");
-let count = 0;
+  const titel = document.createElement("h2");
+  titel.textContent = gruppe.titel;
+  liste.appendChild(titel);
 
-ACHIEVEMENTS.forEach(a => {
-  const done = !!unlocked[a.id];
-  if (done) count++;
+  eintraege.forEach(a => {
+    const fertig = !!freigeschaltet[a.id];
+    if (fertig) anzahl++;
 
-  const el = document.createElement("div");
-  el.className = "achievement" + (done ? "" : " locked");
-  el.innerHTML = `
-    <img src="assets/${done ? "erfolg-gelb" : "erfolg-grau"}.png" alt="">
-    <div>
-      <div class="title">${a.name}</div>
-      <div class="desc">${a.desc}</div>
-    </div>
-  `;
-  list.appendChild(el);
+    const f = Erfolge.fortschritt(a, save);
+    const verstecken = a.geheim && !fertig;
+    const bild = fertig ? gruppe.bild : "erfolg-grau";
+
+    const el = document.createElement("div");
+    el.className = "achievement" + (fertig ? "" : " locked");
+    el.innerHTML =
+      '<img src="assets/' + bild + '.png" alt="">' +
+      '<div>' +
+        '<div class="title">' + (verstecken ? "???" : a.name) + '</div>' +
+        '<div class="desc">' + (verstecken ? "Geheimer Erfolg" : a.desc) + '</div>' +
+        (!fertig && !verstecken && f.ziel > 1
+          ? '<div class="fortschritt">' + f.aktuell + ' / ' + f.ziel + '</div>' : '') +
+      '</div>';
+    liste.appendChild(el);
+  });
 });
 
 document.getElementById("counter").textContent =
-  count + " / " + ACHIEVEMENTS.length + " freigeschaltet";
+  anzahl + " / " + Erfolge.LISTE.length + " freigeschaltet";
 </script>
-
 </body>
 </html>
