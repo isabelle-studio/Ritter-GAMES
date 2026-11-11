@@ -1074,4 +1074,3 @@ function startGame() {
   restartGame();
   particles = keep;
 }
-}
