@@ -2,7 +2,6 @@
 <html lang="de">
 
 <head>
-   <head>
     <meta charset="UTF-8">
     <link rel="manifest" href="manifest.json?v=2">
     <link rel="icon" type="image/png" href="assets/icon-192.png?v=2">
@@ -10,6 +9,7 @@
     <meta name="theme-color" content="#24264f">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
     <title>Ritter Games</title>
 
     <style>
@@ -19,11 +19,6 @@
             font-weight: 100 900;
             font-display: block;
         }
-<script>
-  if ("sw.js" in navigator) {
-    navigator.serviceWorker.register("sw.js");
-  }
-</script>
 
         body {
             margin: 0;
@@ -37,11 +32,13 @@
             user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
+
         .container {
             display: flex;
             flex-direction: column;
             align-items: center;
         }
+
         h1 {
             color: white;
             font-size: clamp(28px, 6vw, 48px);
@@ -49,24 +46,33 @@
             font-weight: 700;
             letter-spacing: 2px;
         }
+
         .menu {
             display: flex;
             gap: 24px;
         }
+
         .card {
             cursor: pointer;
             transition: transform 0.2s;
             display: block;
             text-decoration: none;
         }
-        .card:hover  { transform: scale(1.05); }
-        .card:active { transform: scale(0.96); }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .card:active {
+            transform: scale(0.96);
+        }
 
         .card img {
             width: min(36vw, 220px);
             height: min(36vw, 220px);
             display: block;
         }
+
         .score {
             color: white;
             text-align: center;
@@ -74,56 +80,75 @@
             font-weight: 500;
             font-size: clamp(14px, 3.5vw, 18px);
         }
+
         .achievements {
             margin-top: 30px;
         }
+
         .achievements .card img {
             width: min(24vw, 130px);
             height: min(24vw, 130px);
         }
     </style>
+
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("sw.js");
+        }
+    </script>
 </head>
 
 <body>
 
-<div class="container">
+    <div class="container">
 
-    <h1>RITTER GAMES</h1>
+        <h1>RITTER GAMES</h1>
 
-    <div class="menu">
+        <div class="menu">
 
-        <a class="card" href="snake/">
-            <img src="assets/icon-snake.png" alt="Snake">
-            <div class="score" id="hs-snake">Highscore: 0</div>
-        </a>
+            <a class="card" href="snake/">
+                <img src="assets/icon-snake.png" alt="Snake">
+                <div class="score" id="hs-snake">Highscore: 0</div>
+            </a>
 
-        <a class="card" href="tetris/">
-            <img src="assets/icon-tetris.png" alt="Tetris">
-            <div class="score" id="hs-tetris">Highscore: 0</div>
-        </a>
+            <a class="card" href="tetris/">
+                <img src="assets/icon-tetris.png" alt="Tetris">
+                <div class="score" id="hs-tetris">Highscore: 0</div>
+            </a>
+
+        </div>
+
+        <div class="achievements">
+            <a class="card" href="erfolge.html">
+                <img src="assets/erfolge-icon.png" alt="Erfolge">
+                <div class="score" id="erfolge-zaehler"></div>
+            </a>
+        </div>
 
     </div>
 
-    <div class="achievements">
-        <a class="card" href="erfolge.html">
-            <img src="assets/erfolge-icon.png" alt="Erfolge">
-            <div class="score" id="erfolge-zaehler"></div>
-        </a>
-    </div>
+    <script src="achievements.js"></script>
 
-</div>
+    <script>
+        try {
+            const save = JSON.parse(localStorage.getItem("ritterGames")) || {};
 
-<script src="achievements.js"></script>
-<script>
-  try {
-    const save = JSON.parse(localStorage.getItem("ritterGames")) || {};
-    document.getElementById("hs-snake").textContent = "Highscore: " + (save.snakeHigh || 0);
-    document.getElementById("hs-tetris").textContent = "Highscore: " + (save.tetrisHigh || 0);
+            document.getElementById("hs-snake").textContent =
+                "Highscore: " + (save.snakeHigh || 0);
 
-    const anzahl = Object.keys(save.achievements || {}).length;
-    document.getElementById("erfolge-zaehler").textContent =
-      anzahl + " / " + Erfolge.LISTE.length;
-  } catch (e) {}
-</script>
+            document.getElementById("hs-tetris").textContent =
+                "Highscore: " + (save.tetrisHigh || 0);
+
+            const anzahl = Object.keys(save.achievements || {}).length;
+
+            document.getElementById("erfolge-zaehler").textContent =
+                anzahl + " / " + Erfolge.LISTE.length;
+
+        } catch (e) {
+            console.error(e);
+        }
+    </script>
+
 </body>
+
 </html>
