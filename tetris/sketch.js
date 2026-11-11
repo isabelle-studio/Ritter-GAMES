@@ -230,6 +230,7 @@ function loadFail(name) {
 function resetGame() {
   board = [];
   gameOverTime = 0;
+  Erfolge.zaehle("spiele_gesamt");
   lastBodyColor = "";
   showExitPopup = false;
 
@@ -747,7 +748,9 @@ function checkFullRows() {
   lines += count;
   level = floor(lines / 10) + 1;
   fallInterval = max(100, 700 - (level - 1) * 55);
-
+  Erfolge.zaehle("tetris_reihen", count);
+  Erfolge.bestwert("tetris_reihen_auf_einmal", count);
+  Erfolge.bestwert("tetris_score", score);
   // Kurze Verzögerung für den Zerbröckel-Effekt.
   clearAnimationUntil = millis() + 420;
 }
