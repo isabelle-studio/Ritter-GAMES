@@ -2,88 +2,77 @@
 <html lang="de">
 
 <head>
-      <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="snake/icon-180.png">
-<meta name="theme-color" content="#24264f">
-<meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="apple-touch-icon" href="snake/icon-180.png">
+    <meta name="theme-color" content="#24264f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Ritter Games</title>
 
-  
     <style>
         @font-face {
-    font-family: "Jost";
-    src: url("assets/Jost.ttf") format("truetype");
-    font-weight: 100 900;
-    font-display: block;
-}
+            font-family: "Jost";
+            src: url("assets/Jost.ttf") format("truetype");
+            font-weight: 100 900;
+            font-display: block;
+        }
         body {
             margin: 0;
             background: #24264f;
-
-           display:flex;
-           justify-content:center;
-           align-items:center;
-
-         height:100vh;
-         height:100dvh;
-
-    font-family:"Jost", sans-serif;
-    user-select:none;
-    -webkit-tap-highlight-color:transparent;
-}
-        .container{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-}
-
-h1{
-    color:white;
-    font-size:clamp(28px, 6vw, 48px);
-    margin-bottom:40px;
-
-    font-family:"Jost", sans-serif;
-    font-weight:700;
-    letter-spacing:2px;
-}
-
-       .menu{
-    display:flex;
-    gap:24px;
-}
-
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            height: 100dvh;
+            font-family: "Jost", sans-serif;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: white;
+            font-size: clamp(28px, 6vw, 48px);
+            margin-bottom: 40px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+        .menu {
+            display: flex;
+            gap: 24px;
+        }
         .card {
             cursor: pointer;
             transition: transform 0.2s;
             display: block;
             text-decoration: none;
         }
+        .card:hover  { transform: scale(1.05); }
+        .card:active { transform: scale(0.96); }
 
-        .card:hover {
-            transform: scale(1.05);
+        .card img {
+            width: min(36vw, 220px);
+            height: min(36vw, 220px);
+            display: block;
         }
-        
-.card:active{
-    transform:scale(0.96);
-}
-
-        .card img{
-    width:min(36vw, 220px);
-    height:min(36vw, 220px);
-    display:block;
-}
-      .score {
-    color: white;
-    text-align: center;
-    margin-top: 10px;
-    font-weight: 500;
-    font-size: clamp(14px, 3.5vw, 18px);
-}
-      .achievements{
-    margin-top:30px;
-}
+        .score {
+            color: white;
+            text-align: center;
+            margin-top: 10px;
+            font-weight: 500;
+            font-size: clamp(14px, 3.5vw, 18px);
+        }
+        .achievements {
+            margin-top: 30px;
+        }
+        .achievements .card img {
+            width: min(24vw, 130px);
+            height: min(24vw, 130px);
+        }
     </style>
 </head>
 
@@ -95,32 +84,34 @@ h1{
 
     <div class="menu">
 
- <a class="card" href="erfolge.html">
-    <img src="assets/erfolge-icon.png" alt="Erfolge">
-    <div class="score" id="erfolge-zaehler"></div>
-</a>
+        <a class="card" href="snake/">
+            <img src="assets/icon-snake.png" alt="Snake">
+            <div class="score" id="hs-snake">Highscore: 0</div>
+        </a>
 
-<a class="card" href="tetris/">
-    <img src="assets/icon-tetris.png" alt="Tetris">
-    <div class="score" id="hs-tetris">Highscore: 0</div>
-</a>
+        <a class="card" href="tetris/">
+            <img src="assets/icon-tetris.png" alt="Tetris">
+            <div class="score" id="hs-tetris">Highscore: 0</div>
+        </a>
 
     </div>
-<div class="achievements">
 
-<a class="card" href="erfolge.html">
-    <img src="assets/erfolge-icon.png" alt="Erfolge">
-</a>
+    <div class="achievements">
+        <a class="card" href="erfolge.html">
+            <img src="assets/erfolge-icon.png" alt="Erfolge">
+            <div class="score" id="erfolge-zaehler"></div>
+        </a>
+    </div>
 
 </div>
 
-</div>
 <script src="achievements.js"></script>
 <script>
   try {
     const save = JSON.parse(localStorage.getItem("ritterGames")) || {};
     document.getElementById("hs-snake").textContent = "Highscore: " + (save.snakeHigh || 0);
     document.getElementById("hs-tetris").textContent = "Highscore: " + (save.tetrisHigh || 0);
+
     const anzahl = Object.keys(save.achievements || {}).length;
     document.getElementById("erfolge-zaehler").textContent =
       anzahl + " / " + Erfolge.LISTE.length;
