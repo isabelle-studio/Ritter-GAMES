@@ -1,14 +1,21 @@
 {
-  "id": "menu.html",
+  "id": "/",
   "name": "Ritter Games",
-  "short_name": "Ritter Games",
-  "start_url": "menu.html",
-  "scope": "./",
+  "short_name": "Ritter",
+  "start_url": "./menu.html",
   "display": "standalone",
   "background_color": "#24264f",
   "theme_color": "#24264f",
   "icons": [
-    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }
