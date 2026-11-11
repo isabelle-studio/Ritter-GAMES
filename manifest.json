@@ -3,7 +3,7 @@
   "id": "./",
   "name": "Ritter Games",
   "short_name": "Ritter Games",
-  "start_url": "./menu.html",
+  "start_url": "./loader.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#24264f",
