@@ -67,10 +67,22 @@ h1{
 
 <div class="achievement">
     <img src="assets/erfolg-gelb.png">
-    <div>
-        <div class="title">Erste Schlange</div>
-        <div class="desc">Erreiche 5 Punkte in Snake</div>
+   <div class="achievement">
+
+<img
+    id="ach-erste-schlange"
+    src="assets/erfolg-grau.png">
+
+<div>
+    <div class="title">
+        Erste Schlange
     </div>
+
+    <div class="desc">
+        Erreiche 5 Punkte in Snake
+    </div>
+</div>
+
 </div>
 
 <div class="achievement">
@@ -82,6 +94,22 @@ h1{
 </div>
 
 </div>
+<script>
 
+const save =
+  JSON.parse(localStorage.getItem("ritterGames")) || {};
+
+const achievements =
+  save.achievements || {};
+
+if (achievements.erste_schlange) {
+
+  document.getElementById(
+    "ach-erste-schlange"
+  ).src = "assets/erfolg-gelb.png";
+
+}
+
+</script>
 </body>
 </html>
